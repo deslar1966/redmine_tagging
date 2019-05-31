@@ -1,5 +1,11 @@
 module TaggingPlugin
   module ApiTemplateHandlerPatch
+    class << self
+      def included(base)
+        base.send(:extend, ClassMethods)
+      end
+    end
+
     module ClassMethods
       def call(template)
         template = replace_if(template, /views\/issues\/index.api.rsb$/, 'app/views/issues/index_with_tags.api.rsb')
@@ -21,5 +27,5 @@ module TaggingPlugin
   end
 end
 
-#Redmine::Views::ApiTemplateHandler.send(:include, TaggingPlugin::ApiTemplateHandlerPatch)
+Redmine::Views::ApiTemplateHandler.send(:include, TaggingPlugin::ApiTemplateHandlerPatch)
 Redmine::Views::ApiTemplateHandler.prepend(TaggingPlugin::ApiTemplateHandlerPatch::ClassMethods)

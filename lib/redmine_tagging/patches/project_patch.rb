@@ -8,7 +8,7 @@ module RedmineTagging::Patches::ProjectPatch
         joins(:taggings).
         joins(<<-SQL
           inner join #{Issue.table_name} issues on
-            issues.project_id = #{ActiveRecord::Base::sanitize(id)} and
+            #{ActiveRecord::Base::sanitize_sql(["issues.project_id=?", id])} and
             issues.id = #{ActsAsTaggableOn::Tagging.table_name}.taggable_id
         SQL
         ).order(:name).uniq

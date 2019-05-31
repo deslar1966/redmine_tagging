@@ -37,84 +37,82 @@ module RedmineTagging::Patches::IssuePatch
     end
   end
 
-  module WithTags
-    def create_journal
-      if @current_journal
-        tag_context = TaggingPlugin::ContextHelper.context_for(project)
-        before      = @issue_tags_before_change
-        after       = TaggingPlugin::TagsHelper.to_string(tag_list_on(tag_context))
-        unless before == after
-          @current_journal.details << JournalDetail.new(
-            property:  'attr',
-            prop_key:  'tags',
-            old_value: before,
-            value:     after)
-        end
-      end
-      super
-    end
-
-    def init_journal(user, notes = "")
-      unless project.nil?
-        tag_context               = TaggingPlugin::ContextHelper.context_for(project)
-        @issue_tags_before_change = TaggingPlugin::TagsHelper.to_string(tag_list_on(tag_context))
-      end
-      super(user, notes)
-    end
-
-    def copy_from(arg, options = {})
-      super(arg, options)
-      issue             = arg.is_a?(Issue) ? arg : Issue.visible.find(arg)
-      self.tag_list_ctx = issue.tag_list_ctx
-      self
-    end
-
-    def tags
-      issue_tags.map(&:to_s).join(' ')
-    end
-
-    def tag_list_ctx
+  def create_journal
+    if @current_journal
       tag_context = TaggingPlugin::ContextHelper.context_for(project)
-      tag_list_on(tag_context)
-    end
-
-    def tag_list_ctx=(new_list)
-      tag_context = TaggingPlugin::ContextHelper.context_for(project)
-      set_tag_list_on(tag_context, new_list)
-    end
-
-    private
-
-    def update_tags
-      project_context = TaggingPlugin::ContextHelper.context_for(project)
-
-      # Fix context if project changed
-      if project_id_changed? && !new_record?
-        @new_project_id = project_id
-
-        taggings.update_all(context: project_context)
+      before      = @issue_tags_before_change
+      after       = TaggingPlugin::TagsHelper.to_string(tag_list_on(tag_context))
+      unless before == after
+        @current_journal.details << JournalDetail.new(
+          property:  'attr',
+          prop_key:  'tags',
+          old_value: before,
+          value:     after)
       end
+    end
+    super
+  end
 
-      if @tags_to_update
-        set_tag_list_on(project_context, @tags_to_update)
-      end
+  def init_journal(user, notes = "")
+    unless project.nil?
+      tag_context               = TaggingPlugin::ContextHelper.context_for(project)
+      @issue_tags_before_change = TaggingPlugin::TagsHelper.to_string(tag_list_on(tag_context))
+    end
+    super(user, notes)
+  end
 
-      true
+  def copy_from(arg, options = {})
+    super(arg, options)
+    issue             = arg.is_a?(Issue) ? arg : Issue.visible.find(arg)
+    self.tag_list_ctx = issue.tag_list_ctx
+    self
+  end
+
+  def tags
+    issue_tags.map(&:to_s).join(' ')
+  end
+
+  def tag_list_ctx
+    tag_context = TaggingPlugin::ContextHelper.context_for(project)
+    tag_list_on(tag_context)
+  end
+
+  def tag_list_ctx=(new_list)
+    tag_context = TaggingPlugin::ContextHelper.context_for(project)
+    set_tag_list_on(tag_context, new_list)
+  end
+
+  private
+
+  def update_tags
+    project_context = TaggingPlugin::ContextHelper.context_for(project)
+
+    # Fix context if project changed
+    if project_id_changed? && !new_record?
+      @new_project_id = project_id
+
+      taggings.update_all(context: project_context)
     end
 
-    def cleanup_tags
-      if @new_project_id
-        context = TaggingPlugin::ContextHelper.context_for(project)
-        ActsAsTaggableOn::Tagging.where(
-          'context != ? AND taggable_id = ? AND taggable_type = ?', context, id, 'Issue'
-        ).delete_all
-      end
-      true
+    if @tags_to_update
+      set_tag_list_on(project_context, @tags_to_update)
     end
+
+    true
+  end
+
+  def cleanup_tags
+    if @new_project_id
+      context = TaggingPlugin::ContextHelper.context_for(project)
+      ActsAsTaggableOn::Tagging.where(
+        'context != ? AND taggable_id = ? AND taggable_type = ?', context, id, 'Issue'
+      ).delete_all
+    end
+    true
   end
 end
 
 unless Issue.included_modules.include? RedmineTagging::Patches::IssuePatch
-  #Issue.send :include, RedmineTagging::Patches::IssuePatch
-  Issue.prepend RedmineTagging::Patches::IssuePatch::WithTags
+  Issue.send :include, RedmineTagging::Patches::IssuePatch
+  Issue.prepend RedmineTagging::Patches::IssuePatch
 end

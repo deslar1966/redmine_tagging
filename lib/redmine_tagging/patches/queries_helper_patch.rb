@@ -1,18 +1,16 @@
 module RedmineTagging::Patches::QueriesHelperPatch
   extend ActiveSupport::Concern
   
-  module ColumnContentWithTags
-    def column_content(column, issue)
-      value = column.value(issue)
+  def column_content(column, issue)
+    value = column.value(issue)
 
-      if array_of_issue_tags?(value)
-        links = value.map do |issue_tag|
-          link_to_project_tag_filter(@project, issue_tag.tag)
-        end
-        links.join(', ')
-      else
-        super(column, issue)
+    if array_of_issue_tags?(value)
+      links = value.map do |issue_tag|
+        link_to_project_tag_filter(@project, issue_tag.tag)
       end
+      links.join(', ')
+    else
+      super(column, issue)
     end
   end
 
@@ -21,4 +19,4 @@ module RedmineTagging::Patches::QueriesHelperPatch
   end
 end
 
-QueriesHelper.prepend RedmineTagging::Patches::QueriesHelperPatch::ColumnContentWithTags
+QueriesHelper.prepend RedmineTagging::Patches::QueriesHelperPatch

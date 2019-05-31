@@ -2,9 +2,9 @@ require 'redmine'
 
 Redmine::Plugin.register :redmine_tagging do
   name 'Redmine Tagging Plugin'
-  author 'Restream'
-  description 'This plugin adds tagging features to Redmine.'
-  version '0.1.6'
+  author 'Restream, windviki'
+  description 'This plugin adds tagging features to Redmine. Forked from Restream.'
+  version '0.1.100'
 
   settings default: {
       dynamic_font_size: '1',

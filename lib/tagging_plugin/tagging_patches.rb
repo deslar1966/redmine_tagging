@@ -1,7 +1,7 @@
 module TaggingPlugin
 
   module ProjectsHelperPatch
-    module ProjectSettingsTabsWithTagsTab
+    module WithTags
       def project_settings_tabs
         tabs = super
         tabs << { name: 'tags', partial: 'tagging/tagtab', label: :tagging_tab_label }
@@ -11,7 +11,7 @@ module TaggingPlugin
   end
 
   module WikiControllerPatch
-    module UpdateWithTags
+    module WithTags
       def update
         if params[:wiki_page]
           if tags = params[:wiki_page][:tags]
@@ -25,7 +25,5 @@ module TaggingPlugin
   end
 end
 
-#WikiController.send(:include, TaggingPlugin::WikiControllerPatch) unless WikiController.included_modules.include? TaggingPlugin::WikiControllerPatch
-#ProjectsHelper.send(:include, TaggingPlugin::ProjectsHelperPatch) unless ProjectsHelper.included_modules.include? TaggingPlugin::ProjectsHelperPatch
-WikiController.prepend(TaggingPlugin::WikiControllerPatch::UpdateWithTags) unless WikiController.included_modules.include? TaggingPlugin::WikiControllerPatch
-ProjectsHelper.prepend(TaggingPlugin::ProjectsHelperPatch::ProjectSettingsTabsWithTagsTab) unless ProjectsHelper.included_modules.include? TaggingPlugin::ProjectsHelperPatch
+WikiController.prepend(TaggingPlugin::WikiControllerPatch::WithTags) unless WikiController.included_modules.include? TaggingPlugin::WikiControllerPatch
+ProjectsHelper.prepend(TaggingPlugin::ProjectsHelperPatch::WithTags) unless ProjectsHelper.included_modules.include? TaggingPlugin::ProjectsHelperPatch
