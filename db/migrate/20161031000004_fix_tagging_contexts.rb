@@ -1,4 +1,4 @@
-class FixTaggingContexts < ActiveRecord::Migration
+class FixTaggingContexts < ActiveRecord::Migration[5.0]
 
   PREFIX = "context_"
 

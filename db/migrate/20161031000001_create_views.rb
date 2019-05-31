@@ -1,5 +1,6 @@
-class CreateViews < ActiveRecord::Migration
+class CreateViews < ActiveRecord::Migration[5.0]
   def up
+    execute 'DROP TABLE IF EXISTS issue_tags'
     execute 'DROP VIEW IF EXISTS issue_tags'
 
     execute <<-SQL
@@ -15,6 +16,7 @@ class CreateViews < ActiveRecord::Migration
         taggable_type = 'Issue'
     SQL
 
+    execute 'DROP TABLE IF EXISTS wiki_page_tags'
     execute 'DROP VIEW IF EXISTS wiki_page_tags'
 
     execute <<-SQL
