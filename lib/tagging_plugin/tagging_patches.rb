@@ -8,11 +8,6 @@ module TaggingPlugin
         return tabs
       end
     end 
-    
-    #class InstanceMethods
-    #  prepend ProjectSettingsTabsWithTagsTab
-    #end
-
   end
 
   module WikiControllerPatch
@@ -27,11 +22,6 @@ module TaggingPlugin
         super
       end
     end
-   
-    #class InstanceMethods
-    #  prepend UpdateWithTags
-    #end
-
   end
 end
 
